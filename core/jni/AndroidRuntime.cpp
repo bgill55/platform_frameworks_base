@@ -356,15 +356,6 @@ static int hasDir(const char* dir)
     return 0;
 }
 
-static bool hasFile(const char* file) {
-    struct stat s;
-    int res = stat(file, &s);
-    if (res == 0) {
-        return S_ISREG(s.st_mode);
-    }
-    return false;
-}
-
 /*
  * Read the persistent locale.
  */
@@ -777,16 +768,10 @@ int AndroidRuntime::startVm(JavaVM** pJavaVM, JNIEnv** pEnv)
             parseCompilerOption("dalvik.vm.image-dex2oat-filter", dex2oatImageCompilerFilterBuf,
                                 "--compiler-filter=", "-Ximage-compiler-option");
         }
-
-        // Make sure there is a preloaded-classes file.
-        if (!hasFile("/system/etc/preloaded-classes")) {
-            ALOGE("Missing preloaded-classes file, /system/etc/preloaded-classes not found: %s\n",
-                  strerror(errno));
-            goto bail;
-        }
         addOption("-Ximage-compiler-option");
-        addOption("--image-classes=/system/etc/preloaded-classes");
-
+        addOption("--image-classes-zip=/system/framework/framework.jar");
+        addOption("-Ximage-compiler-option");
+        addOption("--image-classes=preloaded-classes");
         property_get("dalvik.vm.image-dex2oat-flags", dex2oatImageFlagsBuf, "");
         parseExtraOpts(dex2oatImageFlagsBuf, "-Ximage-compiler-option");
 
