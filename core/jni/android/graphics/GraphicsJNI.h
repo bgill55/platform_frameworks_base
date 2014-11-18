@@ -201,6 +201,7 @@ public:
 
 private:
     JavaVM* fVM;
+    bool fAllocateInJavaHeap;
     jbyteArray fStorageObj;
     int fAllocCount;
 };

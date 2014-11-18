@@ -1170,6 +1170,8 @@ static JNINativeMethod gMtpPropertyGroupMethods[] = {
                                         (void *)android_mtp_MtpPropertyGroup_format_date_time},
 };
 
+static const char* const kClassPathName = "android/mtp/MtpDatabase";
+
 int register_android_mtp_MtpDatabase(JNIEnv *env)
 {
     jclass clazz;
