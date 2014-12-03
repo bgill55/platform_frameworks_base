@@ -4000,6 +4000,15 @@ public class WindowManagerService extends IWindowManager.Stub
             if (changed) {
                 mFocusedApp = newFocus;
                 mInputMonitor.setFocusedAppLw(newFocus);
+                setFocusedStackFrame();
+                if (SHOW_LIGHT_TRANSACTIONS) Slog.i(TAG, ">>> OPEN TRANSACTION setFocusedApp");
+                SurfaceControl.openTransaction();
+                try {
+                    setFocusedStackLayer();
+                } finally {
+                    SurfaceControl.closeTransaction();
+                    if (SHOW_LIGHT_TRANSACTIONS) Slog.i(TAG, ">>> CLOSE TRANSACTION setFocusedApp");
+                }
             }
 
             if (moveFocusNow && changed) {
@@ -6084,6 +6093,10 @@ public class WindowManagerService extends IWindowManager.Stub
                             ws.isDisplayedLw()) {
                         screenshotReady = true;
                     }
+
+                    if (ws.isFullscreen(dw, dh) && ws.isOpaqueDrawn()){
+                        break;
+                    }
                 }
 
                 if (appToken != null && appWin == null) {
@@ -7129,6 +7142,7 @@ public class WindowManagerService extends IWindowManager.Stub
             displayInfo.getAppMetrics(mDisplayMetrics);
             mDisplayManagerInternal.setDisplayInfoOverrideFromWindowManager(
                     displayContent.getDisplayId(), displayInfo);
+            displayContent.mBaseDisplayRect.set(0, 0, dw, dh);
         }
         if (false) {
             Slog.i(TAG, "Set app display size: " + appWidth + " x " + appHeight);
